@@ -1,11 +1,9 @@
 const mongoose = require("mongoose");
+const MONGO_URI = process.env.MONGO_URI;
 
-const MONGO_URI = process.env.MONGO_URI || "mongodb://localhost:27017/db_namphrae?authSource=admin";
-
-mongoose
-  .connect(MONGO_URI)
-  .then(() => console.log("✅ MongoDB connected (internal)"))
-  .catch((err) => {
+mongoose.connect(MONGO_URI)
+  .then(() => console.log("✅ MongoDB connected"))
+  .catch(err => {
     console.error("❌ MongoDB connection error:", err.message);
     process.exit(1);
   });
