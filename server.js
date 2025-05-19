@@ -19,6 +19,8 @@ const express = require("express");
 const app = express();
 app.use(express.json()); // รองรับ JSON body
 
+app.use("/api/menu", require("./routes/menuRoutes"));
+
 app.use((req, res, next) => {
   const allowedOrigins = [
     "http://localhost:3004",
