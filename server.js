@@ -25,6 +25,7 @@ app.use("/api/problems", require("./routes/problemOptions"));
 app.use((req, res, next) => {
   const allowedOrigins = [
     "http://localhost:3004",
+    "http://localhost:3000",
     "https://www.smart-namphrae.app",
     "https://express-docker-server-production.up.railway.app",
   ];
