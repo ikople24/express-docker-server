@@ -20,16 +20,26 @@ const app = express();
 app.use(express.json()); // รองรับ JSON body
 
 app.use("/api/menu", require("./routes/menuRoutes"));
+app.use("/api/problems", require("./routes/problemOptions"));
 
 app.use((req, res, next) => {
   const allowedOrigins = [
     "http://localhost:3004",
-    "https://www.smart-namphrae.app"
+    "https://www.smart-namphrae.app",
+    "https://express-docker-server-production.up.railway.app",
   ];
   const origin = req.headers.origin || "";
 
-  if (origin && !allowedOrigins.includes(origin)) {
+  if (origin && allowedOrigins.includes(origin)) {
+    res.setHeader("Access-Control-Allow-Origin", origin);
+    res.setHeader("Access-Control-Allow-Methods", "GET,POST,PUT,PATCH,DELETE,OPTIONS");
+    res.setHeader("Access-Control-Allow-Headers", "Content-Type, Authorization");
+  } else if (origin) {
     return res.status(403).json({ error: "Access denied: Origin not allowed" });
+  }
+
+  if (req.method === "OPTIONS") {
+    return res.sendStatus(204);
   }
 
   next();
