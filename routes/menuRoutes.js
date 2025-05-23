@@ -32,5 +32,24 @@ router.get("/", async (req, res) => {
     res.status(500).json({ error: "Internal Server Error" });
   }
 });
+// POST: อัปเดตลำดับของเมนู
+router.post("/update-order", async (req, res) => {
+  try {
+    const updates = req.body; // คาดว่าเป็น array เช่น [{ _id: '...', order: 1 }, ...]
+    if (!Array.isArray(updates)) {
+      return res.status(400).json({ error: "Invalid data format" });
+    }
+
+    for (const item of updates) {
+      await Menu.findByIdAndUpdate(item._id, { order: item.order });
+    }
+
+    res.status(200).json({ message: "Menu order updated successfully" });
+  } catch (err) {
+    console.error("❌ Error updating menu order:", err.message);
+    res.status(500).json({ error: "Internal Server Error" });
+  }
+});
+
 
 module.exports = router;

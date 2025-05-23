@@ -30,4 +30,26 @@ router.post("/", async (req, res) => {
   }
 });
 
+router.put("/:id", async (req, res) => {
+  try {
+    const updatedProblem = await ProblemOption.findByIdAndUpdate(
+      req.params.id,
+      req.body,
+      { new: true }
+    );
+    res.json({ message: "Problem option updated", data: updatedProblem });
+  } catch (err) {
+    res.status(500).json({ error: "Failed to update problem option" });
+  }
+});
+
+router.delete("/:id", async (req, res) => {
+  try {
+    await ProblemOption.findByIdAndDelete(req.params.id);
+    res.json({ message: "Problem option deleted" });
+  } catch (err) {
+    res.status(500).json({ error: "Failed to delete problem option" });
+  }
+});
+
 module.exports = router;
