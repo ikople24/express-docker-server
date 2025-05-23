@@ -23,6 +23,7 @@ app.use((req, res, next) => {
   const allowedOrigins = [
     "http://localhost:3004",
     "http://localhost:3000",
+    "https://smart-namphrae.app",
     "https://www.smart-namphrae.app",
     "https://express-docker-server-production.up.railway.app",
   ];
