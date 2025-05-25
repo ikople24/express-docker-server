@@ -2,6 +2,9 @@ require("dotenv").config(); // เพิ่มบรรทัดนี้ไว�
 const mongoose = require("mongoose");
 const MONGO_URI = process.env.MONGO_URI;
 
+const { Clerk } = require('@clerk/clerk-sdk-node');
+Clerk({ apiKey: process.env.CLERK_SECRET_KEY });
+
 if (!MONGO_URI) {
   console.error("❌ Missing MONGO_URI env");
   process.exit(1);
@@ -18,6 +21,8 @@ mongoose.connect(MONGO_URI)
 const express = require("express");
 const app = express();
 app.use(express.json()); // รองรับ JSON body
+
+
 
 app.use((req, res, next) => {
   const allowedOrigins = [
@@ -46,6 +51,7 @@ app.use((req, res, next) => {
 
 app.use("/api/menu", require("./routes/menuRoutes"));
 app.use("/api/problems", require("./routes/problemOptions"));
+app.use("/api/users", require("./routes/users"));
 
 // 🔹 Route เริ่มต้น
 app.get("/", (req, res) => {
