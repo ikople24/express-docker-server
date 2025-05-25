@@ -1,7 +1,6 @@
 const clerkClient = require('@clerk/clerk-sdk-node');
 const express = require("express");
-const fetch = require("node-fetch");
-const axios = require("axios");
+
 const User = require("../models/Users.js");
 
 const router = express.Router();
