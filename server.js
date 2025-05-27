@@ -52,6 +52,7 @@ app.use((req, res, next) => {
 app.use("/api/menu", require("./routes/menuRoutes"));
 app.use("/api/problems", require("./routes/problemOptions"));
 app.use("/api/users", require("./routes/users"));
+app.use("/api/complaints", require("./routes/submittedreports"));
 
 // 🔹 Route เริ่มต้น
 app.get("/", (req, res) => {
