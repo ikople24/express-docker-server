@@ -1,7 +1,6 @@
 // utils/getNextSequence.js
 
-
-export async function getNextSequence(db, name) {
+async function getNextSequence(db, name) {
   const counters = db.collection('counters');
   const result = await counters.findOneAndUpdate(
     { _id: name },
@@ -9,6 +8,8 @@ export async function getNextSequence(db, name) {
     { returnDocument: 'after', upsert: true }
   );
 
-  const number = result.value.seq.toString().padStart(6, '0'); // เช่น 000001
+  const number = result.value.seq.toString().padStart(6, '0');
   return `CMP-${number}`;
 }
+
+module.exports = { getNextSequence };
