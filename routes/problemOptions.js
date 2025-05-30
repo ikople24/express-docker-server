@@ -1,4 +1,5 @@
 const express = require("express");
+const mongoose = require("mongoose");
 const ProblemOption = require("../models/ProblemOption");
 
 const router = express.Router();
@@ -31,9 +32,15 @@ router.post("/", async (req, res) => {
 });
 
 router.put("/:id", async (req, res) => {
+  console.log("🛠 Updating ProblemOption with ID:", req.params.id);
   try {
+    const { id } = req.params;
+    if (!id || !mongoose.Types.ObjectId.isValid(id)) {
+      return res.status(400).json({ error: "Invalid ID" });
+    }
+
     const updatedProblem = await ProblemOption.findByIdAndUpdate(
-      req.params.id,
+      id,
       req.body,
       { new: true }
     );
