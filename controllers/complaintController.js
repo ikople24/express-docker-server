@@ -1,3 +1,21 @@
+// Preview next complaintId (for frontend display only, does NOT increment counter)
+exports.previewNextComplaintId = async (req, res) => {
+  try {
+    const counters = mongoose.connection.db.collection("counters");
+    console.log("📦 DB Ready:", !!counters);
+
+    const latest = await counters.findOne({ _id: "complaintId" });
+    console.log("🔍 Latest Counter:", latest);
+
+    const nextSeq = (latest?.seq || 0) + 1;
+    const nextId = `CMP-${nextSeq.toString().padStart(6, "0")}`;
+    console.log("➡️ Previewing nextId:", nextId);
+
+    res.json({ nextId });
+  } catch (error) {
+    res.status(500).json({ error: "Failed to preview next complaint ID." });
+  }
+};
 // controllers/complaintController.js
 const Complaint = require("../models/Complaint");
 const { getNextSequence } = require("../utils/getNextSequence");
@@ -12,13 +30,13 @@ exports.getReports = async (req, res) => {
   if (complaintId) filter.complaintId = complaintId;
   if (status) filter.status = status;
 
+  console.log("my is controller reports");
   try {
     let reports = await Complaint.find(filter).sort({ timestamp: -1 });
-
     // Limit fields for non-authenticated users (public)
     if (!req.user || !req.user.role || req.user.role !== "admin") {
-      reports = reports.map(({ _id, complaintId, category, timestamp, location, status }) => ({
-        _id, complaintId, category, timestamp, location, status
+      reports = reports.map(({ _id, complaintId, category, timestamp, location, status, detail, imageUrl, community }) => ({
+        _id, complaintId, category, timestamp, location, status, detail, imageUrl, community
       }));
     }
 

@@ -19,8 +19,10 @@ mongoose.connect(MONGO_URI)
 
 // ข้างบนสุด
 const express = require("express");
+const morgan = require("morgan");
 const app = express();
 app.use(express.json()); // รองรับ JSON body
+app.use(morgan("dev")); // morgan สำหรับ log HTTP requests
 
 
 
@@ -53,6 +55,7 @@ app.use("/api/menu", require("./routes/menuRoutes"));
 app.use("/api/problems", require("./routes/problemOptions"));
 app.use("/api/users", require("./routes/users"));
 app.use("/api/complaints", require("./routes/submittedreports"));
+
 
 // 🔹 Route เริ่มต้น
 app.get("/", (req, res) => {

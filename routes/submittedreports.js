@@ -7,6 +7,7 @@ const {
   updateReport,
   deleteReport,
   getSingleReport,
+  previewNextComplaintId,
 } = require("../controllers/complaintController");
 
 // GET all reports
@@ -20,6 +21,9 @@ router.patch("/:id", requireAuth, updateReport);
 
 // DELETE a report
 router.delete("/:id", requireAuth, deleteReport);
+
+// GET preview next complaintId
+router.get("/preview-id", previewNextComplaintId);
 
 // GET single report by ID
 router.get("/:id", getSingleReport);
