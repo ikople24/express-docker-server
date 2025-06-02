@@ -1,7 +1,7 @@
 const express = require("express");
 const router = express.Router();
 
-const requireAuth = require("../middileware/requireAuth");
+const requireAuth = require("../middleware/requireAuth");
 const usersController = require("../controllers/usersController");
 
 // Create a new user (needs authentication)

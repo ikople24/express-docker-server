@@ -55,6 +55,7 @@ app.use("/api/menu", require("./routes/menuRoutes"));
 app.use("/api/problems", require("./routes/problemOptions"));
 app.use("/api/users", require("./routes/users"));
 app.use("/api/complaints", require("./routes/submittedreports"));
+app.use("/api/assignments", require("./routes/assignments"));
 
 
 // 🔹 Route เริ่มต้น
