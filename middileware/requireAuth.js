@@ -1,4 +1,4 @@
-const { verifyToken } = require("@clerk/clerk-sdk-node");
+const { verifyToken } = require("@clerk/backend");
 
 module.exports = async function requireAuth(req, res, next) {
   const authHeader = req.headers.authorization;
@@ -8,7 +8,7 @@ module.exports = async function requireAuth(req, res, next) {
 
   const token = authHeader.replace("Bearer ", "");
   try {
-    const payload = await verifyToken(token);
+    const payload = await verifyToken(token, { secretKey: process.env.CLERK_SECRET_KEY });
     req.user = payload;
     next();
   } catch (error) {
