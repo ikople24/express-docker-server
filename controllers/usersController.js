@@ -4,9 +4,9 @@ const clerkClient = require("@clerk/clerk-sdk-node");
 // Create a new user (requires authentication)
 exports.createUser = async (req, res) => {
   try {
-    const clerkId = req.user?.sub;
+    const clerkId = req.body.clerkId;
     if (!clerkId) {
-      return res.status(400).json({ success: false, message: "Missing Clerk ID from token." });
+      return res.status(400).json({ success: false, message: "Missing Clerk ID from request body." });
     }
 
     const existingUser = await User.findOne({ clerkId });
