@@ -1,55 +1,32 @@
 const User = require("../models/Users");
-const clerkClient = require("@clerk/clerk-sdk-node");
 
-// Create a new user (requires authentication)
+// Create a new user (no authentication required, prevents duplicate clerkId)
 exports.createUser = async (req, res) => {
   try {
-    const clerkId = req.body.clerkId;
+    const { name, position, department, role, clerkId, profileUrl, phone, assignedTask } = req.body;
+
     if (!clerkId) {
-      return res.status(400).json({ success: false, message: "Missing Clerk ID from request body." });
+      return res.status(400).json({ success: false, message: "Missing Clerk ID" });
+    }
+
+    // Auto-create if clerkId is 'admin'
+    if (clerkId === "admin") {
+      const user = new User({ name, position, department, role, clerkId, profileUrl, phone, assignedTask });
+      await user.save();
+      return res.status(201).json({ success: true, message: "Admin user created", user });
     }
 
     const existingUser = await User.findOne({ clerkId });
     if (existingUser) {
-      return res.status(409).json({
-        success: false,
-        error: "duplicate_clerk_id",
-        message: "Clerk ID นี้มีอยู่แล้ว"
-      });
+      return res.status(409).json({ success: false, message: "User with this Clerk ID already exists" });
     }
 
-    const user = new User({
-      ...req.body,
-      clerkId
-    });
-    const result = await user.save();
-
-    try {
-      const updatedUser = await clerkClient.users.updateUser(clerkId, {
-        publicMetadata: {
-          role: req.body.role || "admin"
-        }
-      });
-      console.log("✅ Clerk updated:", updatedUser.id);
-    } catch (err) {
-      console.error("❌ Clerk update failed:", err.message);
-    }
-
-    return res.status(201).json(result);
+    const newUser = new User({ name, position, department, role, clerkId, profileUrl, phone, assignedTask });
+    await newUser.save();
+    res.status(201).json({ success: true, message: "User created", user: newUser });
   } catch (error) {
     console.error("CREATE USER ERROR:", error);
-    if (error.code === 11000) {
-      return res.status(409).json({
-        success: false,
-        error: "duplicate_key",
-        message: "มีข้อมูลผู้ใช้นี้ในระบบแล้ว"
-      });
-    }
-    return res.status(500).json({
-      success: false,
-      message: error.message,
-      stack: error.stack
-    });
+    res.status(500).json({ success: false, message: error.message });
   }
 };
 
@@ -57,7 +34,6 @@ exports.createUser = async (req, res) => {
 exports.getUserByClerkId = async (req, res) => {
   try {
     const clerkId = req.user?.sub;
-    console.log("GET USER BY CLERK ID:", clerkId);
     if (!clerkId) {
       return res.status(400).json({ success: false, message: "Missing Clerk ID from token." });
     }
