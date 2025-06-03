@@ -103,3 +103,25 @@ exports.getSingleReport = async (req, res) => {
     res.status(500).json({ error: "Failed to fetch report." });
   }
 };
+
+
+// Update complaint status only (ปิดเรื่อง)
+exports.updateComplaintStatus = async (req, res) => {
+  try {
+    const { status } = req.body;
+
+    const updated = await Complaint.findByIdAndUpdate(
+      req.params.id,
+      { status },
+      { new: true }
+    );
+
+    if (!updated) {
+      return res.status(404).json({ error: "ไม่พบข้อมูลที่ต้องการอัปเดต" });
+    }
+
+    res.json(updated);
+  } catch (error) {
+    res.status(400).json({ error: "อัปเดตสถานะไม่สำเร็จ" });
+  }
+};

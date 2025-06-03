@@ -1,3 +1,4 @@
+const { updateComplaintStatus } = require("../controllers/complaintController");
 const express = require("express");
 const router = express.Router();
 const requireAuth = require("../middleware/requireAuth");
@@ -27,5 +28,8 @@ router.get("/preview-id", previewNextComplaintId);
 
 // GET single report by ID
 router.get("/:id", getSingleReport);
+
+// PUT update only status
+router.put("/update-status/:id", requireAuth, updateComplaintStatus);
 
 module.exports = router;

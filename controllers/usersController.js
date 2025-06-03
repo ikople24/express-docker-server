@@ -57,6 +57,7 @@ exports.createUser = async (req, res) => {
 exports.getUserByClerkId = async (req, res) => {
   try {
     const clerkId = req.user?.sub;
+    console.log("GET USER BY CLERK ID:", clerkId);
     if (!clerkId) {
       return res.status(400).json({ success: false, message: "Missing Clerk ID from token." });
     }
