@@ -48,3 +48,13 @@ exports.getUserByClerkId = async (req, res) => {
     return res.status(500).json({ success: false, message: error.message });
   }
 };
+// Get all users with basic info
+exports.getAllBasicUsers = async (req, res) => {
+  try {
+    const users = await User.find({}, "_id name position department profileUrl");
+    res.status(200).json({ success: true, users });
+  } catch (error) {
+    console.error("GET ALL BASIC USERS ERROR:", error);
+    res.status(500).json({ success: false, message: error.message });
+  }
+};
