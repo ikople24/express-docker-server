@@ -24,6 +24,8 @@ router.put("/:id", async (req, res) => {
   }
 });
 
+
+
 // GET all assignments
 router.get("/", async (req, res) => {
   try {
@@ -31,6 +33,34 @@ router.get("/", async (req, res) => {
     res.status(200).json(assignments);
   } catch (error) {
     res.status(500).json({ error: "Failed to fetch assignments" });
+  }
+});
+
+// GET assignment by ID
+router.get("/:id", async (req, res) => {
+  try {
+    const assignment = await Assignment.findById(req.params.id);
+    if (!assignment) {
+      return res.status(404).json({ error: "Assignment not found" });
+    }
+    res.status(200).json(assignment);
+  } catch (error) {
+    console.error("Error fetching assignment by ID:", error);
+    res.status(500).json({ error: "Failed to fetch assignment" });
+  }
+});
+
+// GET assignment by complaintId
+router.get("/by-complaint/:complaintId", async (req, res) => {
+  try {
+    const assignment = await Assignment.findOne({ complaintId: req.params.complaintId });
+    if (!assignment) {
+      return res.status(404).json({ error: "Assignment not found by complaintId" });
+    }
+    res.status(200).json(assignment);
+  } catch (error) {
+    console.error("Error fetching assignment by complaintId:", error);
+    res.status(500).json({ error: "Failed to fetch assignment" });
   }
 });
 

@@ -5,7 +5,7 @@ exports.createAssignment = async (req, res) => {
       complaintId,
       userId,
       assignedAt: new Date(),
-      solution: solution || '',
+      solution: Array.isArray(solution) ? solution : [solution],
       solutionImages: solutionImages || [],
       completedAt: completedAt || null,
       note: note || '',
