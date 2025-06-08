@@ -25,10 +25,9 @@ const mongoose = require("mongoose");
 exports.getReports = async (req, res) => {
   const { category, complaintId, status } = req.query;
   const filter = {};
-
   if (category) filter.category = category;
   if (complaintId) filter.complaintId = complaintId;
-  if (status) filter.status = status;
+  filter.status = status || "อยู่ระหว่างดำเนินการ";
 
   console.log("my is controller reports");
   try {
