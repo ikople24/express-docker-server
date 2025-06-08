@@ -8,7 +8,7 @@ async function getNextSequence(db, name) {
     { returnDocument: 'after', upsert: true }
   );
 
-  const number = result.value.seq.toString().padStart(6, '0');
+  const number = result.value.sequence_value.toString().padStart(6, '0');
   return `CMP-${number}`;
 }
 

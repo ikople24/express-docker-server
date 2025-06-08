@@ -7,7 +7,7 @@ exports.previewNextComplaintId = async (req, res) => {
     const latest = await counters.findOne({ _id: "complaintId" });
     console.log("🔍 Latest Counter:", latest);
 
-    const nextSeq = (latest?.seq || 0) + 1;
+    const nextSeq = (latest?.sequence_value || 0) + 1;
     const nextId = `CMP-${nextSeq.toString().padStart(6, "0")}`;
     console.log("➡️ Previewing nextId:", nextId);
 
@@ -52,7 +52,7 @@ exports.createReport = async (req, res) => {
     const complaintId = await getNextSequence(mongoose.connection.db, "complaintId");
     const report = new Complaint({ ...req.body, complaintId });
     const savedReport = await report.save();
-    res.status(201).json(savedReport);
+    res.status(201).json({ complaintId: savedReport.complaintId });
   } catch (error) {
     res.status(400).json({ error: "Failed to submit report." });
   }
