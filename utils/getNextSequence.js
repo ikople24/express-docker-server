@@ -4,7 +4,7 @@ async function getNextSequence(db, name) {
   const counters = db.collection('counters');
   const result = await counters.findOneAndUpdate(
     { _id: name },
-    { $inc: { seq: 1 } },
+    { $inc: { sequence_value: 1 } },
     { returnDocument: 'after', upsert: true }
   );
 

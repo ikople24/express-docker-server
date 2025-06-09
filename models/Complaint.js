@@ -16,10 +16,11 @@ const complaintSchema = new mongoose.Schema(
     },
     status: { type: String, default: "อยู่ระหว่างดำเนินการ" },
     officer: String,
-    timestamp: { type: Date, default: Date.now },
-    updatedAt: { type: Date, default: Date.now },
   },
-  { collection: "submittedreports" }
+  {
+    collection: "submittedreports",
+    timestamps: { createdAt: "createdAt", updatedAt: "updatedAt" }
+  }
 );
 
 module.exports = mongoose.model("Complaint", complaintSchema);
