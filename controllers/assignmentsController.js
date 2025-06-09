@@ -1,5 +1,14 @@
+const getDbConnection = require('../utils/dbManager');
+const assignmentSchema = require('../models/Assignment');
+
 exports.createAssignment = async (req, res) => {
   try {
+    const appId = req.headers['x-app-id'];
+    if (!appId) return res.status(400).json({ message: "Missing app-id" });
+
+    const conn = await getDbConnection(appId);
+    const Assignment = conn.model('Assignment', assignmentSchema);
+
     const { complaintId, userId, solution, solutionImages, completedAt, note } = req.body;
     const newAssignment = new Assignment({
       complaintId,

@@ -17,6 +17,8 @@ exports.previewNextComplaintId = async (req, res) => {
   }
 };
 // controllers/complaintController.js
+const getDbConnection = require('../utils/dbManager');
+const complaintSchema = require('../models/Complaint');
 const Complaint = require("../models/Complaint");
 const { getNextSequence } = require("../utils/getNextSequence");
 const mongoose = require("mongoose");
@@ -31,6 +33,9 @@ exports.getReports = async (req, res) => {
 
   console.log("my is controller reports");
   try {
+    const appId = req.headers['x-app-id'];
+    const conn = await getDbConnection(appId);
+    const Complaint = conn.model('Complaint', complaintSchema);
     let reports = await Complaint.find(filter).sort({ timestamp: -1 });
     // Limit fields for non-authenticated users (public)
     if (!req.user || !req.user.role || req.user.role !== "admin") {
@@ -48,7 +53,10 @@ exports.getReports = async (req, res) => {
 // Create a new complaint
 exports.createReport = async (req, res) => {
   try {
-    const complaintId = await getNextSequence(mongoose.connection.db, "complaintId");
+    const appId = req.headers['x-app-id'];
+    const conn = await getDbConnection(appId);
+    const Complaint = conn.model('Complaint', complaintSchema);
+    const complaintId = await getNextSequence(conn.db, "complaintId");
     const report = new Complaint({ ...req.body, complaintId });
     const savedReport = await report.save();
     res.status(201).json({ complaintId: savedReport.complaintId });
@@ -60,6 +68,9 @@ exports.createReport = async (req, res) => {
 // Update complaint (admin only)
 exports.updateReport = async (req, res) => {
   try {
+    const appId = req.headers['x-app-id'];
+    const conn = await getDbConnection(appId);
+    const Complaint = conn.model('Complaint', complaintSchema);
     const updated = await Complaint.findByIdAndUpdate(
       req.params.id,
       req.body,
@@ -75,6 +86,9 @@ exports.updateReport = async (req, res) => {
 // Delete complaint (admin only)
 exports.deleteReport = async (req, res) => {
   try {
+    const appId = req.headers['x-app-id'];
+    const conn = await getDbConnection(appId);
+    const Complaint = conn.model('Complaint', complaintSchema);
     await Complaint.findByIdAndDelete(req.params.id);
     res.json({ success: true });
   } catch (error) {
@@ -85,6 +99,9 @@ exports.deleteReport = async (req, res) => {
 // Get a single complaint by ID
 exports.getSingleReport = async (req, res) => {
   try {
+    const appId = req.headers['x-app-id'];
+    const conn = await getDbConnection(appId);
+    const Complaint = conn.model('Complaint', complaintSchema);
     const report = await Complaint.findById(req.params.id);
 
     if (!report) {
@@ -108,7 +125,9 @@ exports.getSingleReport = async (req, res) => {
 exports.updateComplaintStatus = async (req, res) => {
   try {
     const { status } = req.body;
-
+    const appId = req.headers['x-app-id'];
+    const conn = await getDbConnection(appId);
+    const Complaint = conn.model('Complaint', complaintSchema);
     const updated = await Complaint.findByIdAndUpdate(
       req.params.id,
       { status },
