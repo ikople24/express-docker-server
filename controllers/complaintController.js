@@ -1,3 +1,35 @@
+// Update only location by _id (for admin use)
+exports.updateLocation = async (req, res) => {
+  try {
+    const { location } = req.body;
+
+    const updated = await Complaint.findByIdAndUpdate(
+      req.params.id,
+      { location },
+      { new: true }
+    );
+
+    if (!updated) {
+      return res.status(404).json({ error: "ไม่พบข้อมูลสำหรับอัปเดต" });
+    }
+
+    res.json(updated);
+  } catch (error) {
+    res.status(400).json({ error: "ไม่สามารถอัปเดต location ได้" });
+  }
+};
+// Get personal info by _id
+exports.getPersonalInfo = async (req, res) => {
+  try {
+    const report = await Complaint.findById(req.params.id).select("fullName phone location");
+    if (!report) {
+      return res.status(404).json({ error: "ไม่พบข้อมูลผู้แจ้ง" });
+    }
+    res.json(report);
+  } catch (error) {
+    res.status(500).json({ error: "ไม่สามารถดึงข้อมูลผู้แจ้งได้" });
+  }
+};
 // Preview next complaintId (for frontend display only, does NOT increment counter)
 exports.previewNextComplaintId = async (req, res) => {
   try {
