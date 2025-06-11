@@ -32,4 +32,4 @@ const AssignmentSchema = new mongoose.Schema({
   },
 });
 
-module.exports = mongoose.model("Assignment", AssignmentSchema, "assignments");
+module.exports = AssignmentSchema;
