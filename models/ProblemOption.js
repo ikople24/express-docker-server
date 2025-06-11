@@ -7,4 +7,4 @@ const problemOptionSchema = new mongoose.Schema({
   active: { type: Boolean, default: true }
 });
 
-module.exports = mongoose.model("ProblemOption", problemOptionSchema)
+module.exports = problemOptionSchema;

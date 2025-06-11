@@ -1,21 +1,7 @@
 require("dotenv").config(); // เพิ่มบรรทัดนี้ไว้บนสุด
-const mongoose = require("mongoose");
-const MONGO_URI = process.env.MONGO_URI;
 
 const { Clerk } = require('@clerk/clerk-sdk-node');
 Clerk({ apiKey: process.env.CLERK_SECRET_KEY });
-
-if (!MONGO_URI) {
-  console.error("❌ Missing MONGO_URI env");
-  process.exit(1);
-}
-
-mongoose.connect(MONGO_URI)
-  .then(() => console.log("✅ MongoDB connected"))
-  .catch(err => {
-    console.error("❌ MongoDB connection error:", err.message);
-    process.exit(1);
-  });
 
 // ข้างบนสุด
 const express = require("express");
@@ -24,25 +10,28 @@ const app = express();
 app.use(express.json()); // รองรับ JSON body
 app.use(morgan("dev")); // morgan สำหรับ log HTTP requests
 
+app.use((req, res, next) => {
+  const appId = req.headers['x-app-id'];
+  if (!appId) return res.status(400).json({ error: "Missing x-app-id in request headers" });
 
+  const upperAppId = appId.toUpperCase();
+  const uri = process.env[`MONGO_URI_${upperAppId}`];
+  if (!uri) {
+    return res.status(500).json({ error: `MONGO_URI_${upperAppId} not found in environment variables` });
+  }
+
+  // Optionally, attach app-specific info to the request
+  req.appId = appId;
+  req.mongoUri = uri;
+
+  next();
+});
 
 app.use((req, res, next) => {
-  const allowedOrigins = [
-    "http://localhost:3004",
-    "http://localhost:3000",
-    "https://smart-namphrae.app",
-    "https://www.smart-namphrae.app",
-    "https://express-docker-server-production.up.railway.app",
-  ];
   const origin = req.headers.origin || "";
-
-  if (origin && allowedOrigins.includes(origin)) {
-    res.setHeader("Access-Control-Allow-Origin", origin);
-    res.setHeader("Access-Control-Allow-Methods", "GET,POST,PUT,PATCH,DELETE,OPTIONS");
-    res.setHeader("Access-Control-Allow-Headers", "Content-Type, Authorization");
-  } else if (origin) {
-    return res.status(403).json({ error: "Access denied: Origin not allowed" });
-  }
+  res.setHeader("Access-Control-Allow-Origin", origin);
+  res.setHeader("Access-Control-Allow-Methods", "GET,POST,PUT,PATCH,DELETE,OPTIONS");
+  res.setHeader("Access-Control-Allow-Headers", "Content-Type, Authorization, x-app-id");
 
   if (req.method === "OPTIONS") {
     return res.sendStatus(204);
@@ -52,7 +41,7 @@ app.use((req, res, next) => {
 });
 
 app.use("/api/menu", require("./routes/menuRoutes"));
-app.use("/api/problems", require("./routes/problemOptions"));
+app.use("/api/problem-options", require("./routes/problemOptions"));
 app.use("/api/users", require("./routes/users"));
 app.use("/api/complaints", require("./routes/submittedreports"));
 app.use("/api/assignments", require("./routes/assignments"));
@@ -66,7 +55,15 @@ app.get("/", (req, res) => {
 
 // 🔹 GET /api/hello → ทดสอบรับข้อความ
 app.get("/api/hello", (req, res) => {
-  res.json({ message: "👋 Hello from server!" });
+  const appId = req.headers["x-app-id"];
+
+  if (appId === "app_a") {
+    return res.json({ message: "👋 Hello from เส้น A" });
+  } else if (appId === "app_b") {
+    return res.json({ message: "👋 Hello from เส้น B" });
+  } else {
+    return res.status(400).json({ error: "Unknown app-id" });
+  }
 });
 
 // 🔹 POST /api/echo → ทดสอบรับ body แล้วส่งกลับ

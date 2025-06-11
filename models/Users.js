@@ -12,4 +12,4 @@ const UserSchema = new mongoose.Schema({
   isArchived: { type: Boolean, default: false },
 }, { timestamps: true });
 
-module.exports = mongoose.models.User || mongoose.model("User", UserSchema);
+module.exports =  UserSchema;

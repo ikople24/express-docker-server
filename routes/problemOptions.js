@@ -1,11 +1,14 @@
 const express = require("express");
+const getDbConnection = require("../utils/dbManager");
+const problemOptionSchema = require("../models/ProblemOption");
 const mongoose = require("mongoose");
-const ProblemOption = require("../models/ProblemOption");
 
 const router = express.Router();
 
 router.get("/", async (req, res) => {
   try {
+    const conn = await getDbConnection(req.headers['x-app-id']);
+    const ProblemOption = conn.model('ProblemOption', problemOptionSchema);
     const problems = await ProblemOption.find({ active: true });
     res.json(problems);
   } catch (err) {
@@ -15,6 +18,8 @@ router.get("/", async (req, res) => {
 
 router.post("/", async (req, res) => {
   try {
+    const conn = await getDbConnection(req.headers['x-app-id']);
+    const ProblemOption = conn.model('ProblemOption', problemOptionSchema);
     const { label, iconUrl, category, active } = req.body;
     const newProblem = new ProblemOption({
       label,
@@ -38,6 +43,8 @@ router.put("/:id", async (req, res) => {
     if (!id || !mongoose.Types.ObjectId.isValid(id)) {
       return res.status(400).json({ error: "Invalid ID" });
     }
+    const conn = await getDbConnection(req.headers['x-app-id']);
+    const ProblemOption = conn.model('ProblemOption', problemOptionSchema);
 
     const updatedProblem = await ProblemOption.findByIdAndUpdate(
       id,
@@ -52,6 +59,8 @@ router.put("/:id", async (req, res) => {
 
 router.delete("/:id", async (req, res) => {
   try {
+    const conn = await getDbConnection(req.headers['x-app-id']);
+    const ProblemOption = conn.model('ProblemOption', problemOptionSchema);
     await ProblemOption.findByIdAndDelete(req.params.id);
     res.json({ message: "Problem option deleted" });
   } catch (err) {

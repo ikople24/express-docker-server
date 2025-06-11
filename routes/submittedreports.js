@@ -19,8 +19,8 @@ router.put("/update-location/:id", requireAuth, updateLocation);
 // GET all reports
 router.get("/", getReports);
 
-// POST new report
-router.post("/", createReport);
+// POST แจ้งเข้า
+router.post("/submit-report", createReport);
 
 // PATCH update status (requires auth)
 router.patch("/:id", requireAuth, updateReport);

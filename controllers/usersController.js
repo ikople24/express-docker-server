@@ -1,15 +1,21 @@
-const User = require("../models/Users");
+const getDbConnection = require('../utils/dbManager');
+const userSchema = require('../models/Users');
 
 // Create a new user (no authentication required, prevents duplicate clerkId)
 exports.createUser = async (req, res) => {
   try {
+    const appId = req.headers['x-app-id'];
+    if (!appId) return res.status(400).json({ success: false, message: "Missing app-id" });
+
+    const conn = await getDbConnection(appId);
+    const User = conn.model('User', userSchema);
+
     const { name, position, department, role, clerkId, profileUrl, phone, assignedTask } = req.body;
 
     if (!clerkId) {
       return res.status(400).json({ success: false, message: "Missing Clerk ID" });
     }
 
-    // Auto-create if clerkId is 'admin'
     if (clerkId === "admin") {
       const user = new User({ name, position, department, role, clerkId, profileUrl, phone, assignedTask });
       await user.save();
@@ -33,6 +39,12 @@ exports.createUser = async (req, res) => {
 // Get user by authenticated Clerk ID (requires authentication)
 exports.getUserByClerkId = async (req, res) => {
   try {
+    const appId = req.headers['x-app-id'];
+    if (!appId) return res.status(400).json({ success: false, message: "Missing app-id" });
+
+    const conn = await getDbConnection(appId);
+    const User = conn.model('User', userSchema);
+
     const clerkId = req.user?.sub;
     if (!clerkId) {
       return res.status(400).json({ success: false, message: "Missing Clerk ID from token." });
@@ -51,6 +63,12 @@ exports.getUserByClerkId = async (req, res) => {
 // Get all users with basic info
 exports.getAllBasicUsers = async (req, res) => {
   try {
+    const appId = req.headers['x-app-id'];
+    if (!appId) return res.status(400).json({ success: false, message: "Missing app-id" });
+
+    const conn = await getDbConnection(appId);
+    const User = conn.model('User', userSchema);
+
     const users = await User.find({}, "_id name position department profileUrl");
     res.status(200).json({ success: true, users });
   } catch (error) {

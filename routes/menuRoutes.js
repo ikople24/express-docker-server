@@ -1,6 +1,6 @@
 const express = require("express");
 const router = express.Router();
-const Menu = require("../models/Menu");
+const getDbConnection = require("../utils/dbManager");
 
 // POST: เพิ่มเมนูใหม่จาก frontend
 router.post("/", async (req, res) => {
@@ -10,6 +10,8 @@ router.post("/", async (req, res) => {
       return res.status(400).json({ error: "Missing required fields" });
     }
 
+    const conn = await getDbConnection(req.appId);
+    const Menu = conn.model("Menu", require("../models/Menu"));
     const newMenu = new Menu({ Prob_name, Prob_pic });
     const saved = await newMenu.save();
     console.log("✅ New menu saved:", saved);
@@ -23,6 +25,8 @@ router.post("/", async (req, res) => {
 // GET: ดึงเมนูทั้งหมด
 router.get("/", async (req, res) => {
   try {
+    const conn = await getDbConnection(req.appId);
+    const Menu = conn.model("Menu", require("../models/Menu"));
     const menus = await Menu.find({});
     console.log("✅ จำนวน:", menus.length);
     if (menus.length > 0) console.log("📦 ตัวอย่าง:", menus[0]);
@@ -40,6 +44,8 @@ router.post("/update-order", async (req, res) => {
       return res.status(400).json({ error: "Invalid data format" });
     }
 
+    const conn = await getDbConnection(req.appId);
+    const Menu = conn.model("Menu", require("../models/Menu"));
     for (const item of updates) {
       await Menu.findByIdAndUpdate(item._id, { order: item.order });
     }
