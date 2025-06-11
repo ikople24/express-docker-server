@@ -12,31 +12,26 @@ app.use(morgan("dev")); // morgan สำหรับ log HTTP requests
 
 app.use((req, res, next) => {
   const appId = req.headers['x-app-id'];
-  if (!appId) return res.status(400).json({ error: "Missing app-id" });
-  const uri = process.env[`MONGO_URI_${appId.toUpperCase()}`];
-  if (!uri) return res.status(500).json({ error: `Missing MONGO_URI for app-id: ${appId}` });
+  if (!appId) return res.status(400).json({ error: "Missing x-app-id in request headers" });
+
+  const upperAppId = appId.toUpperCase();
+  const uri = process.env[`MONGO_URI_${upperAppId}`];
+  if (!uri) {
+    return res.status(500).json({ error: `MONGO_URI_${upperAppId} not found in environment variables` });
+  }
+
+  // Optionally, attach app-specific info to the request
+  req.appId = appId;
+  req.mongoUri = uri;
+
   next();
 });
 
 app.use((req, res, next) => {
-  const allowedOrigins = [
-    "http://localhost:3004",
-    "http://localhost:3000",
-    "https://smart-namphrae.app",
-    "https://smart-takhli.app",
-    "https://www.smart-namphrae.app",
-    "https://www.smart-takhli.app",
-    "https://express-docker-server-production.up.railway.app",
-  ];
   const origin = req.headers.origin || "";
-
-  if (origin && allowedOrigins.includes(origin)) {
-    res.setHeader("Access-Control-Allow-Origin", origin);
-    res.setHeader("Access-Control-Allow-Methods", "GET,POST,PUT,PATCH,DELETE,OPTIONS");
-    res.setHeader("Access-Control-Allow-Headers", "Content-Type, Authorization");
-  } else if (origin) {
-    return res.status(403).json({ error: "Access denied: Origin not allowed" });
-  }
+  res.setHeader("Access-Control-Allow-Origin", origin);
+  res.setHeader("Access-Control-Allow-Methods", "GET,POST,PUT,PATCH,DELETE,OPTIONS");
+  res.setHeader("Access-Control-Allow-Headers", "Content-Type, Authorization, x-app-id");
 
   if (req.method === "OPTIONS") {
     return res.sendStatus(204);
