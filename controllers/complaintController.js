@@ -9,7 +9,6 @@ exports.updateLocation = async (req, res) => {
     const { location } = req.body;
     const conn = await getDbConnection(req.appId);
     const Complaint = conn.model("Complaint", complaintSchema);
-
     const updated = await Complaint.findByIdAndUpdate(
       req.params.id,
       { location },
@@ -30,7 +29,6 @@ exports.getPersonalInfo = async (req, res) => {
   try {
     const conn = await getDbConnection(req.appId);
     const Complaint = conn.model("Complaint", complaintSchema);
-
     const report = await Complaint.findById(req.params.id).select("fullName phone location");
     if (!report) {
       return res.status(404).json({ error: "ไม่พบข้อมูลผู้แจ้ง" });
