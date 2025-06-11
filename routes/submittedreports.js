@@ -1,4 +1,3 @@
-const { updateComplaintStatus } = require("../controllers/complaintController");
 const express = require("express");
 const router = express.Router();
 const requireAuth = require("../middleware/requireAuth");
@@ -9,7 +8,13 @@ const {
   deleteReport,
   getSingleReport,
   previewNextComplaintId,
+  updateComplaintStatus,
+  getPersonalInfo,
+  updateLocation,
 } = require("../controllers/complaintController");
+
+// PUT update location only
+router.put("/update-location/:id", requireAuth, updateLocation);
 
 // GET all reports
 router.get("/", getReports);
@@ -25,6 +30,10 @@ router.delete("/:id", requireAuth, deleteReport);
 
 // GET preview next complaintId
 router.get("/preview-id", previewNextComplaintId);
+
+
+// GET personal info by _id
+router.get("/personal-info/:id", getPersonalInfo);
 
 // GET single report by ID
 router.get("/:id", getSingleReport);

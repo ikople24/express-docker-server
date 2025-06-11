@@ -1,3 +1,35 @@
+// Update only location by _id (for admin use)
+exports.updateLocation = async (req, res) => {
+  try {
+    const { location } = req.body;
+
+    const updated = await Complaint.findByIdAndUpdate(
+      req.params.id,
+      { location },
+      { new: true }
+    );
+
+    if (!updated) {
+      return res.status(404).json({ error: "ไม่พบข้อมูลสำหรับอัปเดต" });
+    }
+
+    res.json(updated);
+  } catch (error) {
+    res.status(400).json({ error: "ไม่สามารถอัปเดต location ได้" });
+  }
+};
+// Get personal info by _id
+exports.getPersonalInfo = async (req, res) => {
+  try {
+    const report = await Complaint.findById(req.params.id).select("fullName phone location");
+    if (!report) {
+      return res.status(404).json({ error: "ไม่พบข้อมูลผู้แจ้ง" });
+    }
+    res.json(report);
+  } catch (error) {
+    res.status(500).json({ error: "ไม่สามารถดึงข้อมูลผู้แจ้งได้" });
+  }
+};
 // Preview next complaintId (for frontend display only, does NOT increment counter)
 exports.previewNextComplaintId = async (req, res) => {
   try {
@@ -17,8 +49,6 @@ exports.previewNextComplaintId = async (req, res) => {
   }
 };
 // controllers/complaintController.js
-const getDbConnection = require('../utils/dbManager');
-const complaintSchema = require('../models/Complaint');
 const Complaint = require("../models/Complaint");
 const { getNextSequence } = require("../utils/getNextSequence");
 const mongoose = require("mongoose");
@@ -33,9 +63,6 @@ exports.getReports = async (req, res) => {
 
   console.log("my is controller reports");
   try {
-    const appId = req.headers['x-app-id'];
-    const conn = await getDbConnection(appId);
-    const Complaint = conn.model('Complaint', complaintSchema);
     let reports = await Complaint.find(filter).sort({ timestamp: -1 });
     // Limit fields for non-authenticated users (public)
     if (!req.user || !req.user.role || req.user.role !== "admin") {
@@ -53,10 +80,7 @@ exports.getReports = async (req, res) => {
 // Create a new complaint
 exports.createReport = async (req, res) => {
   try {
-    const appId = req.headers['x-app-id'];
-    const conn = await getDbConnection(appId);
-    const Complaint = conn.model('Complaint', complaintSchema);
-    const complaintId = await getNextSequence(conn.db, "complaintId");
+    const complaintId = await getNextSequence(mongoose.connection.db, "complaintId");
     const report = new Complaint({ ...req.body, complaintId });
     const savedReport = await report.save();
     res.status(201).json({ complaintId: savedReport.complaintId });
@@ -68,9 +92,6 @@ exports.createReport = async (req, res) => {
 // Update complaint (admin only)
 exports.updateReport = async (req, res) => {
   try {
-    const appId = req.headers['x-app-id'];
-    const conn = await getDbConnection(appId);
-    const Complaint = conn.model('Complaint', complaintSchema);
     const updated = await Complaint.findByIdAndUpdate(
       req.params.id,
       req.body,
@@ -86,9 +107,6 @@ exports.updateReport = async (req, res) => {
 // Delete complaint (admin only)
 exports.deleteReport = async (req, res) => {
   try {
-    const appId = req.headers['x-app-id'];
-    const conn = await getDbConnection(appId);
-    const Complaint = conn.model('Complaint', complaintSchema);
     await Complaint.findByIdAndDelete(req.params.id);
     res.json({ success: true });
   } catch (error) {
@@ -99,9 +117,6 @@ exports.deleteReport = async (req, res) => {
 // Get a single complaint by ID
 exports.getSingleReport = async (req, res) => {
   try {
-    const appId = req.headers['x-app-id'];
-    const conn = await getDbConnection(appId);
-    const Complaint = conn.model('Complaint', complaintSchema);
     const report = await Complaint.findById(req.params.id);
 
     if (!report) {
@@ -125,9 +140,7 @@ exports.getSingleReport = async (req, res) => {
 exports.updateComplaintStatus = async (req, res) => {
   try {
     const { status } = req.body;
-    const appId = req.headers['x-app-id'];
-    const conn = await getDbConnection(appId);
-    const Complaint = conn.model('Complaint', complaintSchema);
+
     const updated = await Complaint.findByIdAndUpdate(
       req.params.id,
       { status },
