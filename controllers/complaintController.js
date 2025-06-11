@@ -52,7 +52,7 @@ exports.previewNextComplaintId = async (req, res) => {
 
     const nextSeq = (latest?.sequence_value || 0) + 1;
     const nextId = `CMP-${nextSeq.toString().padStart(6, "0")}`;
-    console.log("➡️ Previewing nextId:", nextId);
+    console.log("➡️ Previewing nextId:", nextId);g
 
     res.json({ nextId });
   } catch (error) {
@@ -95,29 +95,6 @@ exports.createReport = async (req, res) => {
     const complaintId = await getNextSequence(conn.db, "complaintId");
     const report = new Complaint({ ...req.body, complaintId });
     const savedReport = await report.save();
-
-    // Define webhook URLs by appId
-    const webhookMap = {
-      app_a: "https://primary-production-a1769.up.railway.app/webhook-test/submit-report",
-      app_b: "https://n8n.yourdomain.com/webhook/app-b-submit",
-    };
-
-    const webhookUrl = webhookMap[req.appId];
-
-    if (webhookUrl) {
-      try {
-        // Use global fetch if available (Node 18+), or require node-fetch if necessary
-        const fetchFn = typeof fetch !== "undefined" ? fetch : require("node-fetch");
-        await fetchFn(webhookUrl, {
-          method: "POST",
-          headers: { "Content-Type": "application/json" },
-          body: JSON.stringify(savedReport),
-        });
-      } catch (err) {
-        console.error("❌ Failed to send webhook to n8n:", err);
-      }
-    }
-
     res.status(201).json({ complaintId: savedReport.complaintId });
   } catch (error) {
     res.status(400).json({ error: "Failed to submit report." });
@@ -140,7 +117,6 @@ exports.updateReport = async (req, res) => {
     res.status(400).json({ error: "Failed to update report." });
   }
 };
-
 
 // Delete complaint (admin only)
 exports.deleteReport = async (req, res) => {
@@ -200,5 +176,19 @@ exports.updateComplaintStatus = async (req, res) => {
     res.json(updated);
   } catch (error) {
     res.status(400).json({ error: "อัปเดตสถานะไม่สำเร็จ" });
+  }
+};
+
+exports.submitReport = async (req, res) => {
+  try {
+    const conn = await getDbConnection(req.appId);
+    const Complaint = conn.model("Complaint", complaintSchema);
+
+    const complaintId = await getNextSequence(conn.db, "complaintId");
+    const report = new Complaint({ ...req.body, complaintId });
+    const savedReport = await report.save();
+    res.status(201).json({ complaintId: savedReport.complaintId });
+  } catch (error) {
+    res.status(400).json({ error: "Failed to submit report." });
   }
 };
