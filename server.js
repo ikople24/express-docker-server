@@ -1,6 +1,6 @@
 require("dotenv").config(); // เพิ่มบรรทัดนี้ไว้บนสุด
 
-const { Clerk } = require('@clerk/clerk-sdk-node');
+const { Clerk } = require("@clerk/clerk-sdk-node");
 Clerk({ apiKey: process.env.CLERK_SECRET_KEY });
 
 // ข้างบนสุด
@@ -11,13 +11,20 @@ app.use(express.json()); // รองรับ JSON body
 app.use(morgan("dev")); // morgan สำหรับ log HTTP requests
 
 app.use((req, res, next) => {
-  const appId = req.headers['x-app-id'];
-  if (!appId) return res.status(400).json({ error: "Missing x-app-id in request headers" });
+  const appId = req.headers["x-app-id"];
+  if (!appId)
+    return res
+      .status(400)
+      .json({ error: "Missing x-app-id in request headers" });
 
   const upperAppId = appId.toUpperCase();
   const uri = process.env[`MONGO_URI_${upperAppId}`];
   if (!uri) {
-    return res.status(500).json({ error: `MONGO_URI_${upperAppId} not found in environment variables` });
+    return res
+      .status(500)
+      .json({
+        error: `MONGO_URI_${upperAppId} not found in environment variables`,
+      });
   }
 
   // Optionally, attach app-specific info to the request
@@ -33,14 +40,22 @@ app.use((req, res, next) => {
     "http://localhost:3000",
     "https://smart-namphrae.app",
     "https://www.smart-namphrae.app",
+    "https://smart-takhli.app",
+    "https://www.smart-takhli.app",
     "https://express-docker-server-production.up.railway.app",
   ];
   const origin = req.headers.origin || "";
 
   if (origin && allowedOrigins.includes(origin)) {
     res.setHeader("Access-Control-Allow-Origin", origin);
-    res.setHeader("Access-Control-Allow-Methods", "GET,POST,PUT,PATCH,DELETE,OPTIONS");
-    res.setHeader("Access-Control-Allow-Headers", "Content-Type, Authorization, x-app-id");
+    res.setHeader(
+      "Access-Control-Allow-Methods",
+      "GET,POST,PUT,PATCH,DELETE,OPTIONS"
+    );
+    res.setHeader(
+      "Access-Control-Allow-Headers",
+      "Content-Type, Authorization, x-app-id"
+    );
   } else if (origin) {
     return res.status(403).json({ error: "Access denied: Origin not allowed" });
   }
@@ -56,8 +71,7 @@ app.use("/api/problem-options", require("./routes/problemOptions"));
 app.use("/api/users", require("./routes/users"));
 app.use("/api/complaints", require("./routes/submittedreports"));
 app.use("/api/assignments", require("./routes/assignments"));
-app.use('/api/admin-options', require("./routes/adminOptions"));
-
+app.use("/api/admin-options", require("./routes/adminOptions"));
 
 // 🔹 Route เริ่มต้น
 app.get("/", (req, res) => {
