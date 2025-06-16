@@ -9,7 +9,7 @@ async function getNextSequence(db, name) {
   );
 
   const number = result.value.sequence_value.toString().padStart(6, '0');
-  return `CMP-${number}`;
+  return `SVR-${number}`;
 }
 
 module.exports = { getNextSequence };

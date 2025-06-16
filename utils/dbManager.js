@@ -10,10 +10,7 @@ async function getDbConnection(appId) {
   const uri = process.env[envKey];
   if (!uri) throw new Error(`Missing MONGO_URI for ${envKey}`);
 
-  const conn = await mongoose.createConnection(uri, {
-    useNewUrlParser: true,
-    useUnifiedTopology: true,
-  });
+  const conn = await mongoose.createConnection(uri);
 
   connections[appId] = conn;
   return conn;
