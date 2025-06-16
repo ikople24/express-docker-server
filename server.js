@@ -11,30 +11,6 @@ app.use(express.json()); // รองรับ JSON body
 app.use(morgan("dev")); // morgan สำหรับ log HTTP requests
 
 app.use((req, res, next) => {
-  const appId = req.headers["x-app-id"];
-  if (!appId)
-    return res
-      .status(400)
-      .json({ error: "Missing x-app-id in request headers" });
-
-  const upperAppId = appId.toUpperCase();
-  const uri = process.env[`MONGO_URI_${upperAppId}`];
-  if (!uri) {
-    return res
-      .status(500)
-      .json({
-        error: `MONGO_URI_${upperAppId} not found in environment variables`,
-      });
-  }
-
-  // Optionally, attach app-specific info to the request
-  req.appId = appId;
-  req.mongoUri = uri;
-
-  next();
-});
-
-app.use((req, res, next) => {
   const allowedOrigins = [
     "http://localhost:3004",
     "http://localhost:3000",
@@ -62,6 +38,30 @@ app.use((req, res, next) => {
   if (req.method === "OPTIONS") {
     return res.sendStatus(204);
   }
+
+  next();
+});
+
+app.use((req, res, next) => {
+  const appId = req.headers["x-app-id"];
+  if (!appId)
+    return res
+      .status(400)
+      .json({ error: "Missing x-app-id in request headers" });
+
+  const upperAppId = appId.toUpperCase();
+  const uri = process.env[`MONGO_URI_${upperAppId}`];
+  if (!uri) {
+    return res
+      .status(500)
+      .json({
+        error: `MONGO_URI_${upperAppId} not found in environment variables`,
+      });
+  }
+
+  // Optionally, attach app-specific info to the request
+  req.appId = appId;
+  req.mongoUri = uri;
 
   next();
 });
