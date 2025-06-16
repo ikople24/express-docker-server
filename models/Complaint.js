@@ -3,7 +3,9 @@ const mongoose = require("mongoose");
 const complaintSchema = new mongoose.Schema(
   {
     complaintId: { type: String, required: true, unique: true },
+    prefix: String,
     fullName: String,
+    address: String,
     phone: String,
     community: String,
     category: String,

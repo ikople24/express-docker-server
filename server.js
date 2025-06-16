@@ -28,11 +28,21 @@ app.use((req, res, next) => {
 });
 
 app.use((req, res, next) => {
+  const allowedOrigins = [
+    "http://localhost:3004",
+    "http://localhost:3000",
+    "https://smart-namphrae.app",
+    "https://www.smart-namphrae.app",
+    "https://express-docker-server-production.up.railway.app",
+  ];
+  if (origin && allowedOrigins.includes(origin)) {
   const origin = req.headers.origin || "";
   res.setHeader("Access-Control-Allow-Origin", origin);
   res.setHeader("Access-Control-Allow-Methods", "GET,POST,PUT,PATCH,DELETE,OPTIONS");
   res.setHeader("Access-Control-Allow-Headers", "Content-Type, Authorization, x-app-id");
-
+  } else if (origin) {
+    return res.status(403).json({ error: "Access denied: Origin not allowed" });
+  }
   if (req.method === "OPTIONS") {
     return res.sendStatus(204);
   }
