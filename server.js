@@ -72,6 +72,7 @@ app.use("/api/users", require("./routes/users"));
 app.use("/api/complaints", require("./routes/submittedreports"));
 app.use("/api/assignments", require("./routes/assignments"));
 app.use("/api/admin-options", require("./routes/adminOptions"));
+app.use("/api/satisfaction", require("./routes/satisfactionRoutes"));
 
 // 🔹 Route เริ่มต้น
 app.get("/", (req, res) => {
