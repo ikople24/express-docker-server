@@ -19,6 +19,7 @@ app.use((req, res, next) => {
     "https://smart-takhli.app",
     "https://www.smart-takhli.app",
     "https://smart-samphran-production.up.railway.app/",
+    "https://smart-saard-production.up.railway.app/",
     "https://express-docker-server-production.up.railway.app",
   ];
   const origin = req.headers.origin || "";
