@@ -1,3 +1,4 @@
+const mongoose = require("mongoose");
 // controllers/satisfactionController.js
 const getDbConnection = require("../utils/dbManager");
 const satisfactionSchema = require("../models/Satisfaction");
@@ -42,7 +43,11 @@ exports.getSatisfactionByComplaintId = async (req, res) => {
     const conn = await getDbConnection(req.appId);
     const Satisfaction = conn.model("Satisfaction", satisfactionSchema);
 
-    const data = await Satisfaction.find({ complaintId })
+    const objectId = mongoose.Types.ObjectId.isValid(complaintId)
+      ? new mongoose.Types.ObjectId(complaintId)
+      : complaintId;
+
+    const data = await Satisfaction.find({ complaintId: objectId })
       .sort({ createdAt: -1 })
       .limit(4);
 
