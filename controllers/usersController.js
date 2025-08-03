@@ -56,7 +56,17 @@ exports.updateUser = async (req, res) => {
       clerkId,
       assignedTask,
       assignedTaskType: typeof assignedTask,
-      assignedTaskLength: assignedTask?.length
+      assignedTaskLength: assignedTask?.length,
+      assignedTaskSplit: typeof assignedTask === 'string' ? assignedTask?.split(", ") : assignedTask
+    });
+
+    // ดูข้อมูลเดิมใน database ก่อน update
+    const existingUser = await User.findOne({ clerkId });
+    console.log("🔍 BACKEND UPDATE - Existing user data:", {
+      clerkId: existingUser?.clerkId,
+      existingAssignedTask: existingUser?.assignedTask,
+      existingAssignedTaskType: typeof existingUser?.assignedTask,
+      existingAssignedTaskSplit: typeof existingUser?.assignedTask === 'string' ? existingUser?.assignedTask?.split(", ") : existingUser?.assignedTask
     });
 
     // ใช้ findOneAndUpdate เพื่อแทนที่ค่าใหม่ทั้งหมด
@@ -83,6 +93,7 @@ exports.updateUser = async (req, res) => {
       clerkId: updatedUser.clerkId,
       assignedTask: updatedUser.assignedTask,
       assignedTaskType: typeof updatedUser.assignedTask,
+      assignedTaskSplit: typeof updatedUser.assignedTask === 'string' ? updatedUser.assignedTask?.split(", ") : updatedUser.assignedTask,
       action: "replaced"
     });
 

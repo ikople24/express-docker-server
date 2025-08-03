@@ -15,4 +15,4 @@ router.get("/get-by-clerkId", requireAuth, usersController.getUserByClerkId);
 // Get all users with basic info
 router.get("/all-basic", usersController.getAllBasicUsers);
 
-module.exports = router; 
+module.exports = router;
