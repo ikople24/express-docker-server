@@ -18,6 +18,8 @@ app.use((req, res, next) => {
     "https://www.smart-namphrae.app",
     "https://smart-takhli.app",
     "https://www.smart-takhli.app",
+    "https://smart-kreang.app",
+    "https://www.smart-kreang.app",
     "https://smart-samphran-production.up.railway.app",
     "https://smart-saard-production.up.railway.app",
     "https://smart-lahansai-production.up.railway.app",
