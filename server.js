@@ -24,6 +24,7 @@ app.use((req, res, next) => {
     "https://smart-saard-production.up.railway.app",
     "https://smart-lahansai-production.up.railway.app",
     "https://smart-nongfag-production.up.railway.app",
+    "https://smart-plakrad-production.up.railway.app",
     "https://smart-thaptilek-production.up.railway.app/",
     "https://express-docker-server-production.up.railway.app",
   ];
