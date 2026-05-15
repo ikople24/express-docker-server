@@ -1,7 +1,7 @@
 const getDbConnection = require('../utils/dbManager');
 const userSchema = require('../models/Users');
 
-// Create a new user (no authentication required, prevents duplicate clerkId)
+// Create a new user (ต้องล็อกอิน + role admin/superadmin ผ่าน requireRole ใน routes)
 exports.createUser = async (req, res) => {
   try {
     const appId = req.headers['x-app-id'];
@@ -129,6 +129,35 @@ exports.getUserByClerkId = async (req, res) => {
   }
 };
 
+// ผู้ใช้ที่ล็อกอินแล้ว: ดึงข้อมูลใน DB ตาม sub ใน JWT (ไม่ต้องเป็น admin)
+exports.getUserForSession = async (req, res) => {
+  try {
+    const appId = req.headers["x-app-id"];
+    if (!appId) return res.status(400).json({ success: false, message: "Missing app-id" });
+
+    const clerkId = req.user?.sub;
+    if (!clerkId) {
+      return res.status(401).json({ success: false, message: "Unauthorized" });
+    }
+
+    const conn = await getDbConnection(appId);
+    const User = conn.model("User", userSchema);
+
+    const user = await User.findOne({ clerkId }).select(
+      "_id name position department profileUrl clerkId phone assignedTask"
+    );
+
+    return res.status(200).json({
+      success: true,
+      registered: !!user,
+      user: user || null,
+    });
+  } catch (error) {
+    console.error("GET USER FOR SESSION ERROR:", error);
+    res.status(500).json({ success: false, message: error.message });
+  }
+};
+
 // Get all users with basic info
 exports.getAllBasicUsers = async (req, res) => {
   try {
@@ -138,7 +167,7 @@ exports.getAllBasicUsers = async (req, res) => {
     const conn = await getDbConnection(appId);
     const User = conn.model('User', userSchema);
 
-    const users = await User.find({}, "_id name position department profileUrl");
+    const users = await User.find({}, "_id name position department profileUrl clerkId");
     res.status(200).json({ success: true, users });
   } catch (error) {
     console.error("GET ALL BASIC USERS ERROR:", error);
